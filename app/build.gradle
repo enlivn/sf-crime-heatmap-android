@@ -1,0 +1,56 @@
+apply plugin: 'com.android.application'
+
+android {
+    signingConfigs {
+        release {
+            keyAlias 'interview'
+            keyPassword 'interview'
+            storeFile file('keys/release.key')
+            storePassword 'interview'
+        }
+    }
+
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        applicationId "com.example.android.sfcrimeheatmap"
+        minSdkVersion 15
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+    }
+    buildTypes {
+        debug {
+            minifyEnabled false
+        }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+}
+
+//for dagger 2
+apply plugin: 'com.neenbedankt.android-apt'
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.google.android.gms:play-services:8.4.0'
+    compile 'com.jakewharton:butterknife:7.0.1'
+    compile 'com.google.dagger:dagger:2.0'
+    compile 'com.squareup.retrofit:retrofit:2.0.0-beta2'
+    compile 'com.squareup.retrofit:converter-gson:2.0.0-beta2'
+    compile 'com.squareup.okhttp:logging-interceptor:2.6.0'
+    compile 'net.danlew:android.joda:2.9.1'
+
+    compile 'com.afollestad:material-dialogs:0.7.6.0'
+
+    //for dagger 2
+    apt 'com.google.dagger:dagger-compiler:2.0.1'
+    provided 'javax.annotation:jsr250-api:1.0'
+}

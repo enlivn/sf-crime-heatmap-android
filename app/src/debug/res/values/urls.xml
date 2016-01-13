@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="api_endpoint_base">https://data.sfgov.org</string>
+    <string name="api_token">yR0Um4FoTjLUqX5AE5HbsadIV</string>
+</resources>

@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">SF Crime Heatmap</string>
+    <string name="title_activity_crime_map">SF Crime Heatmap</string>
+    <string name="loading">Loading…</string>
+    <string name="okay">Okay</string>
+    <string name="no_network_available">Sorry, this app cannot be used without a network connection.</string>
+    <string name="get_crime_data_query_param"><![CDATA[date < \'%1$s\']]></string>
+    <string name="date_format">yyyy-MM-dd\'T\'HH:mm:ss.SSS</string>
+</resources>
