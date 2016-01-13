@@ -1,11 +1,11 @@
 package com.example.android.sfcrimeheatmap.activities;
 
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
 public interface BaseActivityCallbacks {
-    FragmentActivity getBaseActivityContext();
+    AppCompatActivity getBaseActivityContext();
     void showProgressDialog();
     void dismissProgressDialog();
     void showMaterialDialog(int resId);

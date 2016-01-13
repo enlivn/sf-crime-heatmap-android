@@ -1,7 +1,7 @@
 package com.example.android.sfcrimeheatmap.activities;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.android.sfcrimeheatmap.R;
@@ -10,7 +10,7 @@ import com.example.android.sfcrimeheatmap.application.CMAppComponent;
 
 import javax.inject.Inject;
 
-public abstract class BaseActivity extends FragmentActivity implements BaseActivityCallbacks {
+public abstract class BaseActivity extends AppCompatActivity implements BaseActivityCallbacks {
     protected abstract void setupDataInjection(CMAppComponent appComponent);
 
     @Inject
@@ -24,17 +24,11 @@ public abstract class BaseActivity extends FragmentActivity implements BaseActiv
 
     private void bootstrapDI() {
         CMApp app = (CMApp) getApplication();
-        DaggerBaseActivityComponent
-                .builder()
-                .baseActivityModule(new BaseActivityModule(this))
-                .build()
-                .inject(this);
-
         setupDataInjection(app.getAppComponent());
     }
 
     @Override
-    public FragmentActivity getBaseActivityContext(){
+    public AppCompatActivity getBaseActivityContext(){
         return this;
     }
 

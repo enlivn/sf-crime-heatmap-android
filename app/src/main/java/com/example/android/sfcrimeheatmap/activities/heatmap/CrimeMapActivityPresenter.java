@@ -13,6 +13,7 @@ import retrofit.Response;
 import retrofit.Retrofit;
 
 public class CrimeMapActivityPresenter {
+    private static final String DATE_QUERY_STRING = "date > '%s'";
     private final CrimeMapView view;
     private final API api;
 
@@ -22,13 +23,19 @@ public class CrimeMapActivityPresenter {
     }
 
     public void loadMapMarkers() {
-        Call<ArrayList<CrimeIncident>> getCrimeDataCall = api.getCrimeData(view.getBaseActivityContext().getString(R.string.get_crime_data_query_param, DateHelper.getDateOneMonthBefore(view.getBaseActivityContext())));
+        view.showProgressDialog();
+        Call<ArrayList<CrimeIncident>> getCrimeDataCall = api.getCrimeData(String.format(DATE_QUERY_STRING,
+                DateHelper.getDateOneMonthBefore(view.getBaseActivityContext())));
 
         getCrimeDataCall.enqueue(new GlobalRestCallback<ArrayList<CrimeIncident>>(view) {
             @Override
             public void onResponse(Response<ArrayList<CrimeIncident>> response, Retrofit retrofit) {
                 view.dismissProgressDialog();
-                view.showMarkers(response.body());
+                if (response.isSuccess()) {
+                    view.showMarkers(response.body());
+                } else {
+                    view.showMaterialDialog(R.string.error_fetching_data);
+                }
             }
         });
     }

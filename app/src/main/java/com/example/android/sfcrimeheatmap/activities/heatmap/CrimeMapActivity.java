@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import com.example.android.sfcrimeheatmap.R;
 import com.example.android.sfcrimeheatmap.activities.BaseActivity;
-import com.example.android.sfcrimeheatmap.activities.BaseActivityModule;
+import com.example.android.sfcrimeheatmap.activities.MaterialDialogModule;
 import com.example.android.sfcrimeheatmap.application.CMAppComponent;
 import com.example.android.sfcrimeheatmap.rest.models.CrimeIncident;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -12,6 +12,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
@@ -20,10 +21,13 @@ import javax.inject.Inject;
 
 public class CrimeMapActivity extends BaseActivity implements OnMapReadyCallback, CrimeMapView {
 
-    private GoogleMap mMap;
+    private static final LatLng SOUTH_WEST_SF_BOUNDARY = new LatLng(37.707990, -122.502147);
+    private static final LatLng NORTH_EAST_SF_BOUNDARY = new LatLng(37.820354, -122.356578);
 
     @Inject
     CrimeMapActivityPresenter presenter;
+
+    private GoogleMap mMap;
 
     @Override
     protected void setupDataInjection(CMAppComponent appComponent) {
@@ -31,7 +35,7 @@ public class CrimeMapActivity extends BaseActivity implements OnMapReadyCallback
                 .builder()
                 .cMAppComponent(appComponent)
                 .crimeMapActivityModule(new CrimeMapActivityModule(this))
-                .baseActivityModule(new BaseActivityModule(this))
+                .materialDialogModule(new MaterialDialogModule(this))
                 .build()
                 .inject(this);
     }
@@ -58,17 +62,28 @@ public class CrimeMapActivity extends BaseActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        initMap();
+    }
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    private void initMap() {
+        int width = getResources().getDisplayMetrics().widthPixels;
+        int height = getResources().getDisplayMetrics().heightPixels;
+        int padding = (int) (width * 0.12);
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(getZoomBounds(), width, height, padding));
 
         presenter.loadMapMarkers();
     }
 
-    @Override
-    public void showMarkers(ArrayList<CrimeIncident> body) {
+    private LatLngBounds getZoomBounds() {
+        return new LatLngBounds(SOUTH_WEST_SF_BOUNDARY, NORTH_EAST_SF_BOUNDARY);
+    }
 
+    @Override
+    public void showMarkers(ArrayList<CrimeIncident> incidents) {
+        MarkerOptions markerOptions = new MarkerOptions();
+        for (CrimeIncident incident : incidents) {
+            mMap.addMarker(markerOptions.position(incident.getCoordinates()).title(incident.getDescription()));
+        }
     }
 }

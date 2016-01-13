@@ -8,11 +8,11 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class BaseActivityModule {
+public class MaterialDialogModule {
 
     private BaseActivityCallbacks callbacks;
 
-    public BaseActivityModule(BaseActivityCallbacks callbacks) {
+    public MaterialDialogModule(BaseActivityCallbacks callbacks) {
         this.callbacks = callbacks;
     }
 
