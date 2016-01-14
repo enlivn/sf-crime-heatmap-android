@@ -1,29 +1,27 @@
 package com.example.android.sfcrimeheatmap.activities.heatmap;
 
-import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 
 import com.example.android.sfcrimeheatmap.R;
 import com.example.android.sfcrimeheatmap.activities.BaseActivity;
 import com.example.android.sfcrimeheatmap.activities.MaterialDialogModule;
 import com.example.android.sfcrimeheatmap.application.CMAppComponent;
-import com.example.android.sfcrimeheatmap.models.heatmap.CrimeActivityLevel;
-import com.example.android.sfcrimeheatmap.models.heatmap.District;
-import com.example.android.sfcrimeheatmap.rest.models.CrimeIncidentStatistic;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Inject;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 public class CrimeMapActivity extends BaseActivity implements OnMapReadyCallback, CrimeMapView {
 
@@ -34,6 +32,9 @@ public class CrimeMapActivity extends BaseActivity implements OnMapReadyCallback
     CrimeMapActivityPresenter presenter;
 
     private GoogleMap mMap;
+
+    @Bind(R.id.mapTitle)
+    TextView mapTitleTv;
 
     @Override
     protected void setupDataInjection(CMAppComponent appComponent) {
@@ -50,6 +51,7 @@ public class CrimeMapActivity extends BaseActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crime_map);
+        ButterKnife.bind(this);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -76,55 +78,16 @@ public class CrimeMapActivity extends BaseActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void showMarkers(ArrayList<CrimeIncidentStatistic> incidentStatistics) {
-        sortInAscendingOrderOfCrimeReports(incidentStatistics);
+    public void showMarkers(List<MarkerOptions> markerOptionsList) {
         mMap.setInfoWindowAdapter(new CustomMarkerAdapter(this));
-        int numDistricts = incidentStatistics.size();
-        for (int i = 0; i < numDistricts; i++) {
-            CrimeIncidentStatistic incidentStatistic = incidentStatistics.get(i);
-            District district = District.getDistrict(incidentStatistic.getDistrict());
-            if (district != null) {
-                if (i > numDistricts * 2 / 3) {
-                    mMap.addMarker(buildMarker(district, incidentStatistic, CrimeActivityLevel.HIGH));
-                } else if (i > numDistricts / 3) {
-                    mMap.addMarker(buildMarker(district, incidentStatistic, CrimeActivityLevel.MEDIUM));
-                } else {
-                    mMap.addMarker(buildMarker(district, incidentStatistic, CrimeActivityLevel.LOW));
-                }
-            }
+        for(MarkerOptions markerOption: markerOptionsList){
+            mMap.addMarker(markerOption);
         }
     }
 
-    private void sortInAscendingOrderOfCrimeReports(ArrayList<CrimeIncidentStatistic> incidentStatistics) {
-        Collections.sort(incidentStatistics);
-    }
-
-    private MarkerOptions buildMarker(District district,
-                                      CrimeIncidentStatistic incidentStatistic,
-                                      CrimeActivityLevel crimeActivityLevel) {
-        MarkerOptions markerOptions = new MarkerOptions()
-                .position(district.getCoordinates())
-                .title(incidentStatistic.getDistrict())
-                .snippet(String.valueOf(incidentStatistic.getIncidentCount()));
-
-        switch (crimeActivityLevel) {
-            case LOW:
-                markerOptions.icon(buildMarkerIcon(R.color.lowCrime));
-                break;
-            case MEDIUM:
-                markerOptions.icon(buildMarkerIcon(R.color.mediumCrime));
-                break;
-            default:
-                markerOptions.icon(buildMarkerIcon(R.color.highCrime));
-                break;
-        }
-
-        return markerOptions;
-    }
-
-    private BitmapDescriptor buildMarkerIcon(int colorResId) {
-        float[] hsv = new float[3];
-        Color.colorToHSV(Color.parseColor(getString(colorResId)), hsv);
-        return BitmapDescriptorFactory.defaultMarker(hsv[0]);
+    @Override
+    public void showDate(String dateToDisplay) {
+        mapTitleTv.setText(getString(R.string.crime_data_since, dateToDisplay));
+        mapTitleTv.setVisibility(View.VISIBLE);
     }
 }

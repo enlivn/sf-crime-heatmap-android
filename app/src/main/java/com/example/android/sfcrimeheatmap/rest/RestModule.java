@@ -3,8 +3,6 @@ package com.example.android.sfcrimeheatmap.rest;
 import android.content.Context;
 
 import com.example.android.sfcrimeheatmap.R;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 
@@ -57,17 +55,9 @@ public final class RestModule {
 
     @Provides
     @Singleton
-    Gson provideGson(Context context){
-        return new GsonBuilder()
-                .setDateFormat(context.getString(R.string.date_format))
-                .create();
-    }
-
-    @Provides
-    @Singleton
-    Retrofit provideRetrofit(Context context, ConnectionAwareClient client, Gson gson){
+    Retrofit provideRetrofit(Context context, ConnectionAwareClient client){
         return new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(context.getString(R.string.api_endpoint_base))
                 .client(client)
                 .build();

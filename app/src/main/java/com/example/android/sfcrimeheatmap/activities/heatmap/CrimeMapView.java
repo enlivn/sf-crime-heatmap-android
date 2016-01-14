@@ -1,10 +1,11 @@
 package com.example.android.sfcrimeheatmap.activities.heatmap;
 
 import com.example.android.sfcrimeheatmap.activities.BaseActivityCallbacks;
-import com.example.android.sfcrimeheatmap.rest.models.CrimeIncidentStatistic;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface CrimeMapView extends BaseActivityCallbacks {
-    void showMarkers(ArrayList<CrimeIncidentStatistic> body);
+    void showMarkers(List<MarkerOptions> markerOptions);
+    void showDate(String dateToDisplay);
 }

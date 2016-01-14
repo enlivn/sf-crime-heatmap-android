@@ -4,6 +4,9 @@
     <string name="loading">Loading…</string>
     <string name="okay">Okay</string>
     <string name="no_network_available">Sorry, this app cannot be used without a network connection.</string>
-    <string name="date_format">yyyy-MM-dd\'T\'HH:mm:ss.SSS</string>
     <string name="error_fetching_data">There was an error fetching data. Please try again later.</string>
+    <string name="low_crime">Low Crime</string>
+    <string name="medium_crime">Medium Crime</string>
+    <string name="high_crime">High Crime</string>
+    <string name="crime_data_since">Based on crime data since %1$s</string>
 </resources>
