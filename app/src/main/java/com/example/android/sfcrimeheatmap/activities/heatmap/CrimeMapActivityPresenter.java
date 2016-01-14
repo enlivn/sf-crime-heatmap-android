@@ -4,7 +4,7 @@ import com.example.android.sfcrimeheatmap.R;
 import com.example.android.sfcrimeheatmap.helpers.DateHelper;
 import com.example.android.sfcrimeheatmap.rest.API;
 import com.example.android.sfcrimeheatmap.rest.GlobalRestCallback;
-import com.example.android.sfcrimeheatmap.rest.models.CrimeIncident;
+import com.example.android.sfcrimeheatmap.rest.models.CrimeIncidentStatistic;
 
 import java.util.ArrayList;
 
@@ -14,6 +14,9 @@ import retrofit.Retrofit;
 
 public class CrimeMapActivityPresenter {
     private static final String DATE_QUERY_STRING = "date > '%s'";
+    private static final String SELECT_QUERY_STRING = "pddistrict, count(incidntnum)";
+    private static final String GROUP_QUERY_STRING = "pddistrict";
+
     private final CrimeMapView view;
     private final API api;
 
@@ -24,12 +27,13 @@ public class CrimeMapActivityPresenter {
 
     public void loadMapMarkers() {
         view.showProgressDialog();
-        Call<ArrayList<CrimeIncident>> getCrimeDataCall = api.getCrimeData(String.format(DATE_QUERY_STRING,
-                DateHelper.getDateOneMonthBefore(view.getBaseActivityContext())));
+        Call<ArrayList<CrimeIncidentStatistic>> getCrimeDataCall = api.getCrimeData(SELECT_QUERY_STRING,
+                buildWhereClause(),
+                GROUP_QUERY_STRING);
 
-        getCrimeDataCall.enqueue(new GlobalRestCallback<ArrayList<CrimeIncident>>(view) {
+        getCrimeDataCall.enqueue(new GlobalRestCallback<ArrayList<CrimeIncidentStatistic>>(view) {
             @Override
-            public void onResponse(Response<ArrayList<CrimeIncident>> response, Retrofit retrofit) {
+            public void onResponse(Response<ArrayList<CrimeIncidentStatistic>> response, Retrofit retrofit) {
                 view.dismissProgressDialog();
                 if (response.isSuccess()) {
                     view.showMarkers(response.body());
@@ -38,5 +42,10 @@ public class CrimeMapActivityPresenter {
                 }
             }
         });
+    }
+
+    private String buildWhereClause() {
+        return String.format(DATE_QUERY_STRING,
+                DateHelper.getDateOneMonthBefore(view.getBaseActivityContext()));
     }
 }

@@ -1,21 +1,27 @@
 package com.example.android.sfcrimeheatmap.activities.heatmap;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
 import com.example.android.sfcrimeheatmap.R;
 import com.example.android.sfcrimeheatmap.activities.BaseActivity;
 import com.example.android.sfcrimeheatmap.activities.MaterialDialogModule;
 import com.example.android.sfcrimeheatmap.application.CMAppComponent;
-import com.example.android.sfcrimeheatmap.rest.models.CrimeIncident;
+import com.example.android.sfcrimeheatmap.models.heatmap.CrimeActivityLevel;
+import com.example.android.sfcrimeheatmap.models.heatmap.District;
+import com.example.android.sfcrimeheatmap.rest.models.CrimeIncidentStatistic;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.inject.Inject;
 
@@ -49,16 +55,6 @@ public class CrimeMapActivity extends BaseActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -80,10 +76,55 @@ public class CrimeMapActivity extends BaseActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void showMarkers(ArrayList<CrimeIncident> incidents) {
-        MarkerOptions markerOptions = new MarkerOptions();
-        for (CrimeIncident incident : incidents) {
-            mMap.addMarker(markerOptions.position(incident.getCoordinates()).title(incident.getDescription()));
+    public void showMarkers(ArrayList<CrimeIncidentStatistic> incidentStatistics) {
+        sortInAscendingOrderOfCrimeReports(incidentStatistics);
+        mMap.setInfoWindowAdapter(new CustomMarkerAdapter(this));
+        int numDistricts = incidentStatistics.size();
+        for (int i = 0; i < numDistricts; i++) {
+            CrimeIncidentStatistic incidentStatistic = incidentStatistics.get(i);
+            District district = District.getDistrict(incidentStatistic.getDistrict());
+            if (district != null) {
+                if (i > numDistricts * 2 / 3) {
+                    mMap.addMarker(buildMarker(district, incidentStatistic, CrimeActivityLevel.HIGH));
+                } else if (i > numDistricts / 3) {
+                    mMap.addMarker(buildMarker(district, incidentStatistic, CrimeActivityLevel.MEDIUM));
+                } else {
+                    mMap.addMarker(buildMarker(district, incidentStatistic, CrimeActivityLevel.LOW));
+                }
+            }
         }
+    }
+
+    private void sortInAscendingOrderOfCrimeReports(ArrayList<CrimeIncidentStatistic> incidentStatistics) {
+        Collections.sort(incidentStatistics);
+    }
+
+    private MarkerOptions buildMarker(District district,
+                                      CrimeIncidentStatistic incidentStatistic,
+                                      CrimeActivityLevel crimeActivityLevel) {
+        MarkerOptions markerOptions = new MarkerOptions()
+                .position(district.getCoordinates())
+                .title(incidentStatistic.getDistrict())
+                .snippet(String.valueOf(incidentStatistic.getIncidentCount()));
+
+        switch (crimeActivityLevel) {
+            case LOW:
+                markerOptions.icon(buildMarkerIcon(R.color.lowCrime));
+                break;
+            case MEDIUM:
+                markerOptions.icon(buildMarkerIcon(R.color.mediumCrime));
+                break;
+            default:
+                markerOptions.icon(buildMarkerIcon(R.color.highCrime));
+                break;
+        }
+
+        return markerOptions;
+    }
+
+    private BitmapDescriptor buildMarkerIcon(int colorResId) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(Color.parseColor(getString(colorResId)), hsv);
+        return BitmapDescriptorFactory.defaultMarker(hsv[0]);
     }
 }
