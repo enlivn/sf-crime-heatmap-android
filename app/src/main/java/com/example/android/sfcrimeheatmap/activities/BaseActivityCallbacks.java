@@ -6,8 +6,12 @@ import com.afollestad.materialdialogs.MaterialDialog;
 
 public interface BaseActivityCallbacks {
     AppCompatActivity getBaseActivityContext();
+
     void showProgressDialog();
+
     void dismissProgressDialog();
+
     void showMaterialDialog(int resId);
+
     void showMaterialDialog(int resId, MaterialDialog.ButtonCallback callback);
 }

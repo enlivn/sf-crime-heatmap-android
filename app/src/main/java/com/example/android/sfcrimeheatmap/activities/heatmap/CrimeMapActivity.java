@@ -41,6 +41,9 @@ public class CrimeMapActivity extends BaseActivity implements OnMapReadyCallback
     @Bind(R.id.mapTitle)
     TextView mapTitleTv;
 
+    @Bind(R.id.fetchingResults)
+    TextView fetchingResultsTv;
+
     @Override
     protected void setupDataInjection(CMAppComponent appComponent) {
         DaggerCrimeMapActivityComponent
@@ -100,5 +103,15 @@ public class CrimeMapActivity extends BaseActivity implements OnMapReadyCallback
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
         presenter.loadPaginatedCrimeMarkersForDistrictsOnScreen(districtModels, mMap.getProjection().getVisibleRegion());
+    }
+
+    @Override
+    public void showProgressDialog() {
+        fetchingResultsTv.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void dismissProgressDialog() {
+        fetchingResultsTv.setVisibility(View.GONE);
     }
 }

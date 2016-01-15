@@ -1,7 +1,6 @@
 package com.example.android.sfcrimeheatmap.activities.heatmap;
 
 import com.example.android.sfcrimeheatmap.activities.BaseActivityCallbacks;
-import com.example.android.sfcrimeheatmap.models.heatmap.DistrictModel;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;

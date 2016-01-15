@@ -10,11 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:background="@color/mapTitleColor"
+        android:background="@color/colorPrimaryDark"
         android:gravity="center"
-        android:padding="5dp"
-        android:textColor="@color/secondaryText"
-        android:visibility="gone"/>
+        android:textColor="@android:color/white"
+        android:visibility="gone" />
 
     <fragment
         android:id="@+id/map"
@@ -24,39 +23,55 @@
         android:layout_alignParentBottom="true"
         android:layout_below="@id/mapTitle" />
 
+    <TextView
+        android:id="@+id/fetchingResults"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/mapTitle"
+        android:background="@android:color/transparent"
+        android:gravity="start"
+        android:padding="5dp"
+        android:text="@string/updating_results"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/secondaryText"
+        android:visibility="gone" />
+
     <LinearLayout
         android:id="@+id/legendLayout"
-        android:alpha="0.7"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal">
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:alpha="0.7"
+        android:orientation="vertical"
+        android:padding="5dp">
 
         <TextView
             style="@style/SmallBoldText"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:background="@color/lowCrime"
-            android:gravity="center"
+            android:gravity="end"
             android:text="@string/low_crime" />
 
         <TextView
             style="@style/SmallBoldText"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:background="@color/mediumCrime"
-            android:gravity="center"
+            android:gravity="end"
             android:text="@string/medium_crime" />
 
         <TextView
             style="@style/SmallBoldText"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:background="@color/highCrime"
-            android:gravity="center"
+            android:gravity="end"
             android:text="@string/high_crime" />
     </LinearLayout>
 

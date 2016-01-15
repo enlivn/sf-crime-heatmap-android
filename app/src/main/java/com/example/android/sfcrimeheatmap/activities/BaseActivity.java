@@ -42,7 +42,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseActi
         if(dialog != null && dialog.isShowing()) dialog.dismiss();
     }
 
-
     @Override
     public void showMaterialDialog(int resId){
         showMaterialDialog(resId, new MaterialDialog.ButtonCallback() {

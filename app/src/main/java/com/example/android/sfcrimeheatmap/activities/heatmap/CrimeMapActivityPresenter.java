@@ -31,7 +31,8 @@ public class CrimeMapActivityPresenter {
     private static final String WHERE_DISTRICT_QUERY_STRING = "pddistrict = '%s'";
     private static final String SELECT_QUERY_STRING = "pddistrict, count(incidntnum)";
     private static final String GROUP_QUERY_STRING = "pddistrict";
-    private static final Integer LIMIT_PER_API_CALL = 2;
+
+    private static final Integer LIMIT_PER_API_CALL = 3;
     private static final Integer MAX_PAGES_OF_INCIDENTS_TO_FETCH_PER_DISTRICT = 5;
 
     private final CrimeMapView view;
@@ -46,9 +47,11 @@ public class CrimeMapActivityPresenter {
 
     public void loadPaginatedCrimeMarkersForDistrictsOnScreen(List<DistrictModel> districtModels, VisibleRegion visibleRegion) {
         for (final DistrictModel districtModel : districtModels) {
-            if(districtModel.getApiPage() >= MAX_PAGES_OF_INCIDENTS_TO_FETCH_PER_DISTRICT) return;
+            if (districtModel.getApiPage() >= MAX_PAGES_OF_INCIDENTS_TO_FETCH_PER_DISTRICT) return;
 
-            if(isDistrictOnScreen(districtModel, visibleRegion)) {
+            if (isDistrictOnScreen(districtModel, visibleRegion)) {
+                view.showProgressDialog();
+
                 Call<ArrayList<CrimeIncidentStatistic>> getCrimeIncidentsPerDistrictCall = api.getCrimeIncidentsPerDistrict(buildWhereDistrictAndDateClause(districtModel.getDistrict().toString()),
                         districtModel.getApiPage(),
                         LIMIT_PER_API_CALL);
@@ -56,6 +59,7 @@ public class CrimeMapActivityPresenter {
                 getCrimeIncidentsPerDistrictCall.enqueue(new GlobalRestCallback<ArrayList<CrimeIncidentStatistic>>(view) {
                     @Override
                     public void onResponse(Response<ArrayList<CrimeIncidentStatistic>> response, Retrofit retrofit) {
+                        view.dismissProgressDialog();
                         if (response.isSuccess()) {
                             view.showMarkers(processCrimeIncidentMarkers(response.body()));
                             incrementPagination();
