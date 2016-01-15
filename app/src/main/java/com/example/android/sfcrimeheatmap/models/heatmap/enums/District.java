@@ -1,4 +1,4 @@
-package com.example.android.sfcrimeheatmap.models.heatmap;
+package com.example.android.sfcrimeheatmap.models.heatmap.enums;
 
 import com.google.android.gms.maps.model.LatLng;
 
