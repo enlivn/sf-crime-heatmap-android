@@ -26,9 +26,9 @@ public class ConnectionAwareClient extends OkHttpClient {
         }
     }
 
-    private boolean isNetworkPresent(){
+    private boolean isNetworkPresent() {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        return cm.getActiveNetworkInfo()!= null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 
 }

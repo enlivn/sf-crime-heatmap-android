@@ -28,22 +28,22 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseActi
     }
 
     @Override
-    public AppCompatActivity getBaseActivityContext(){
+    public AppCompatActivity getBaseActivityContext() {
         return this;
     }
 
     @Override
-    public void showProgressDialog(){
-        if(dialog != null && !dialog.isShowing()) dialog.show();
+    public void showProgressDialog() {
+        if (dialog != null && !dialog.isShowing()) dialog.show();
     }
 
     @Override
-    public void dismissProgressDialog(){
-        if(dialog != null && dialog.isShowing()) dialog.dismiss();
+    public void dismissProgressDialog() {
+        if (dialog != null && dialog.isShowing()) dialog.dismiss();
     }
 
     @Override
-    public void showMaterialDialog(int resId){
+    public void showMaterialDialog(int resId) {
         showMaterialDialog(resId, new MaterialDialog.ButtonCallback() {
             @Override
             public void onPositive(MaterialDialog dialog) {
@@ -54,7 +54,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseActi
     }
 
     @Override
-    public void showMaterialDialog(int resId, MaterialDialog.ButtonCallback callback){
+    public void showMaterialDialog(int resId, MaterialDialog.ButtonCallback callback) {
         new MaterialDialog.Builder(this)
                 .cancelable(false)
                 .title(resId)

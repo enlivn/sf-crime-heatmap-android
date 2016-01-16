@@ -20,15 +20,15 @@ public class CrimeMapActivityModule {
 
     @Provides
     @ActivityScope
-    CrimeMapActivityPresenter providePresenter(API api){
+    CrimeMapActivityPresenter providePresenter(API api) {
         return new CrimeMapActivityPresenter(crimeMapView, api);
     }
 
     @Provides
     @ActivityScope
-    List<DistrictModel> provideDistricts(){
+    List<DistrictModel> provideDistricts() {
         List<DistrictModel> districtModels = new ArrayList<>();
-        for(com.example.android.sfcrimeheatmap.models.heatmap.enums.District districtName: com.example.android.sfcrimeheatmap.models.heatmap.enums.District.values()){
+        for (com.example.android.sfcrimeheatmap.models.heatmap.enums.District districtName : com.example.android.sfcrimeheatmap.models.heatmap.enums.District.values()) {
             DistrictModel districtModel = new DistrictModel(districtName);
             districtModels.add(districtModel);
         }

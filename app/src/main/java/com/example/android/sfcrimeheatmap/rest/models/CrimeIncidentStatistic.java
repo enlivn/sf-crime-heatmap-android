@@ -45,7 +45,7 @@ public class CrimeIncidentStatistic implements Comparable<CrimeIncidentStatistic
         else return 1;
     }
 
-    public LatLng getCoordinates(){
+    public LatLng getCoordinates() {
         return new LatLng(latitude, longitude);
     }
 }

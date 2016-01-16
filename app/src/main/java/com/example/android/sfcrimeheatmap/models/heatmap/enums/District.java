@@ -22,15 +22,15 @@ public enum District {
         this.longitude = longitude;
     }
 
-    public static District getDistrict(String name){
-        for(District district: values()){
-            if(district.toString().equalsIgnoreCase(name)) return district;
+    public static District getDistrict(String name) {
+        for (District district : values()) {
+            if (district.toString().equalsIgnoreCase(name)) return district;
         }
 
         return null;
     }
 
-    public LatLng getCoordinates(){
+    public LatLng getCoordinates() {
         return new LatLng(latitude, longitude);
     }
 }

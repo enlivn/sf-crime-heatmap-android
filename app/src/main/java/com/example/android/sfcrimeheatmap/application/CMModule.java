@@ -19,7 +19,7 @@ public class CMModule {
 
     @Provides
     @Singleton
-    Context provideContext(){
+    Context provideContext() {
         return app.getApplicationContext();
     }
 }

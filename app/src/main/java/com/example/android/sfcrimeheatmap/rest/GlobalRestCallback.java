@@ -14,9 +14,9 @@ public abstract class GlobalRestCallback<T> implements Callback<T> {
     }
 
     @Override
-    public void onFailure(Throwable t){
+    public void onFailure(Throwable t) {
         baseActivity.dismissProgressDialog();
-        if(t instanceof NoNetworkException){
+        if (t instanceof NoNetworkException) {
             baseActivity.showMaterialDialog(R.string.no_network_available);
         }
     }

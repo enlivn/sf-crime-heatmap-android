@@ -22,7 +22,7 @@ public final class RestModule {
 
     @Provides
     @Singleton
-    HttpLoggingInterceptor provideLoggingInterceptor(){
+    HttpLoggingInterceptor provideLoggingInterceptor() {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -31,13 +31,13 @@ public final class RestModule {
 
     @Provides
     @Singleton
-    TokenHeaderInterceptor provideTokenHeaderInterceptor(Context context){
+    TokenHeaderInterceptor provideTokenHeaderInterceptor(Context context) {
         return new TokenHeaderInterceptor(context.getString(R.string.api_token));
     }
 
     @Provides
     @Singleton
-    OkHttpClient provideHttpClient(HttpLoggingInterceptor loggingInterceptor, TokenHeaderInterceptor tokenHeaderInterceptor){
+    OkHttpClient provideHttpClient(HttpLoggingInterceptor loggingInterceptor, TokenHeaderInterceptor tokenHeaderInterceptor) {
         OkHttpClient client = new OkHttpClient();
         client.setReadTimeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
         client.setConnectTimeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
@@ -49,13 +49,13 @@ public final class RestModule {
 
     @Provides
     @Singleton
-    ConnectionAwareClient provideConnectionAwareClient(Context context, OkHttpClient client){
+    ConnectionAwareClient provideConnectionAwareClient(Context context, OkHttpClient client) {
         return new ConnectionAwareClient(context, client);
     }
 
     @Provides
     @Singleton
-    Retrofit provideRetrofit(Context context, ConnectionAwareClient client){
+    Retrofit provideRetrofit(Context context, ConnectionAwareClient client) {
         return new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(context.getString(R.string.api_endpoint_base))
@@ -65,7 +65,7 @@ public final class RestModule {
 
     @Provides
     @Singleton
-    API provideAPI(Retrofit retrofit){
+    API provideAPI(Retrofit retrofit) {
         return retrofit.create(API.class);
     }
 }

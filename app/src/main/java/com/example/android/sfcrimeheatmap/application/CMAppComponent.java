@@ -15,7 +15,7 @@ public interface CMAppComponent {
     API api();
 
     final class Initializer {
-        public static CMAppComponent initialize(Application app){
+        public static CMAppComponent initialize(Application app) {
             return DaggerCMAppComponent
                     .builder()
                     .cMModule(new CMModule(app))

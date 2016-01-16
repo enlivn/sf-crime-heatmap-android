@@ -89,7 +89,7 @@ public class CrimeMapActivity extends BaseActivity implements OnMapReadyCallback
     @Override
     public void showMarkers(List<MarkerOptions> markerOptionsList) {
         mMap.setInfoWindowAdapter(new CustomMarkerAdapter(this));
-        for(MarkerOptions markerOption: markerOptionsList){
+        for (MarkerOptions markerOption : markerOptionsList) {
             mMap.addMarker(markerOption);
         }
     }
