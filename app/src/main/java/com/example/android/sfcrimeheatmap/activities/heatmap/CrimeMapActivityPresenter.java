@@ -25,6 +25,9 @@ import java.util.List;
 import retrofit.Call;
 import retrofit.Response;
 import retrofit.Retrofit;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class CrimeMapActivityPresenter {
     private static final String WHERE_DATE_QUERY_STRING = "date > '%s'";
@@ -46,38 +49,38 @@ public class CrimeMapActivityPresenter {
     }
 
     public void loadPaginatedCrimeMarkersForDistrictsOnScreen(List<DistrictModel> districtModels, VisibleRegion visibleRegion) {
-        for (final DistrictModel districtModel : districtModels) {
-            if (districtModel.getApiPage() >= MAX_PAGES_OF_INCIDENTS_TO_FETCH_PER_DISTRICT) return;
+        rx.Observable
+                .from(districtModels)
+                .subscribeOn(Schedulers.io())
+                .filter(this::getDistrictModelsWithPagesLeft)
+                .filter(districtModel -> getDistrictModelsOnScreen(districtModel, visibleRegion))
+                .flatMap(this::fetchCrimeIncidentsForDistrict)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(crimeIncidentStatistics -> view.showMarkers(processCrimeIncidentMarkers(crimeIncidentStatistics)));
+    }
 
-            if (isDistrictOnScreen(districtModel, visibleRegion)) {
-                view.showProgressDialog();
+    private Boolean getDistrictModelsWithPagesLeft(DistrictModel districtModel) {
+        return districtModel.getApiPage() < MAX_PAGES_OF_INCIDENTS_TO_FETCH_PER_DISTRICT;
+    }
 
-                Call<ArrayList<CrimeIncidentStatistic>> getCrimeIncidentsPerDistrictCall = api.getCrimeIncidentsPerDistrict(buildWhereDistrictAndDateClause(districtModel.getDistrict().toString()),
-                        districtModel.getApiPage(),
-                        LIMIT_PER_API_CALL);
-
-                getCrimeIncidentsPerDistrictCall.enqueue(new GlobalRestCallback<ArrayList<CrimeIncidentStatistic>>(view) {
-                    @Override
-                    public void onResponse(Response<ArrayList<CrimeIncidentStatistic>> response, Retrofit retrofit) {
-                        view.dismissProgressDialog();
-                        if (response.isSuccess()) {
-                            view.showMarkers(processCrimeIncidentMarkers(response.body()));
-                            incrementPagination();
-                        } else {
-                            view.showMaterialDialog(R.string.error_fetching_data);
-                        }
-                    }
-
-                    private void incrementPagination() {
-                        districtModel.setApiPage(districtModel.getApiPage() + 1);
-                    }
-                });
-            }
-        }
+    private Boolean getDistrictModelsOnScreen(DistrictModel districtModel, VisibleRegion visibleRegion) {
+        return isDistrictOnScreen(districtModel, visibleRegion);
     }
 
     private boolean isDistrictOnScreen(DistrictModel districtModel, VisibleRegion visibleRegion) {
         return visibleRegion.latLngBounds.contains(districtModel.getDistrict().getCoordinates());
+    }
+
+    private void incrementPagination(DistrictModel districtModel) {
+        districtModel.setApiPage(districtModel.getApiPage() + 1);
+    }
+
+    private Observable<ArrayList<CrimeIncidentStatistic>> fetchCrimeIncidentsForDistrict(DistrictModel districtModel) {
+        return api.getCrimeIncidentsPerDistrict(buildWhereDistrictAndDateClause(districtModel.getDistrict().toString()),
+                districtModel.getApiPage(),
+                LIMIT_PER_API_CALL)
+                .doOnNext(results -> incrementPagination(districtModel))
+                .doOnError(results -> view.showMaterialDialog(R.string.error_fetching_data));
     }
 
     private List<MarkerOptions> processCrimeIncidentMarkers(ArrayList<CrimeIncidentStatistic> crimeIncidentStatistics) {
