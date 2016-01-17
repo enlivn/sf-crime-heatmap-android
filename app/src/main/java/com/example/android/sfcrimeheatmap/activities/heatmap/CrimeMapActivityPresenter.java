@@ -8,7 +8,6 @@ import com.example.android.sfcrimeheatmap.models.heatmap.CrimeActivityLevel;
 import com.example.android.sfcrimeheatmap.models.heatmap.DistrictModel;
 import com.example.android.sfcrimeheatmap.models.heatmap.enums.District;
 import com.example.android.sfcrimeheatmap.rest.API;
-import com.example.android.sfcrimeheatmap.rest.GlobalRestCallback;
 import com.example.android.sfcrimeheatmap.rest.models.CrimeIncidentStatistic;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -22,9 +21,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import retrofit.Call;
-import retrofit.Response;
-import retrofit.Retrofit;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -49,17 +45,26 @@ public class CrimeMapActivityPresenter {
     }
 
     public void loadPaginatedCrimeMarkersForDistrictsOnScreen(List<DistrictModel> districtModels, VisibleRegion visibleRegion) {
+        view.showProgressDialog();
+
         rx.Observable
                 .from(districtModels)
                 .subscribeOn(Schedulers.io())
-                .filter(this::getDistrictModelsWithPagesLeft)
+                .filter(this::getDistrictModelsWithPagesLeftToFetch)
                 .filter(districtModel -> getDistrictModelsOnScreen(districtModel, visibleRegion))
                 .flatMap(this::fetchCrimeIncidentsForDistrict)
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnTerminate(this::dismissProgressDialog)
+                .doOnError(this::showErrorDialog)
+                .onErrorResumeNext(throwable -> Observable.empty())
                 .subscribe(crimeIncidentStatistics -> view.showMarkers(processCrimeIncidentMarkers(crimeIncidentStatistics)));
     }
 
-    private Boolean getDistrictModelsWithPagesLeft(DistrictModel districtModel) {
+    private void dismissProgressDialog() {
+        view.dismissProgressDialog();
+    }
+
+    private Boolean getDistrictModelsWithPagesLeftToFetch(DistrictModel districtModel) {
         return districtModel.getApiPage() < MAX_PAGES_OF_INCIDENTS_TO_FETCH_PER_DISTRICT;
     }
 
@@ -79,8 +84,7 @@ public class CrimeMapActivityPresenter {
         return api.getCrimeIncidentsPerDistrict(buildWhereDistrictAndDateClause(districtModel.getDistrict().toString()),
                 districtModel.getApiPage(),
                 LIMIT_PER_API_CALL)
-                .doOnNext(results -> incrementPagination(districtModel))
-                .doOnError(results -> view.showMaterialDialog(R.string.error_fetching_data));
+                .doOnNext(results -> incrementPagination(districtModel));
     }
 
     private List<MarkerOptions> processCrimeIncidentMarkers(ArrayList<CrimeIncidentStatistic> crimeIncidentStatistics) {
@@ -98,22 +102,28 @@ public class CrimeMapActivityPresenter {
     public void loadDistrictCountMarkers() {
         view.showProgressDialog();
 
-        Call<ArrayList<CrimeIncidentStatistic>> getCrimeCountsPerDistrictCall = api.getCrimeCountsPerDistrict(SELECT_QUERY_STRING,
+        getCrimeCountsPerDistrict()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnTerminate(this::dismissProgressDialog)
+                .doOnError(this::showErrorDialog)
+                .onErrorResumeNext(throwable -> Observable.empty())
+                .subscribe(this::processCrimeIncidentStatistics);
+    }
+
+    private void showErrorDialog(Throwable throwable) {
+        view.showMaterialDialog(R.string.error_fetching_data);
+    }
+
+    private Observable<ArrayList<CrimeIncidentStatistic>> getCrimeCountsPerDistrict() {
+        return api.getCrimeCountsPerDistrict(SELECT_QUERY_STRING,
                 buildWhereDateClause(),
                 GROUP_QUERY_STRING);
+    }
 
-        getCrimeCountsPerDistrictCall.enqueue(new GlobalRestCallback<ArrayList<CrimeIncidentStatistic>>(view) {
-            @Override
-            public void onResponse(Response<ArrayList<CrimeIncidentStatistic>> response, Retrofit retrofit) {
-                view.dismissProgressDialog();
-                if (response.isSuccess()) {
-                    view.showDate(DateHelper.dateToStringForDisplay(oneMonthBeforeToday));
-                    view.showMarkers(processCrimeCountMarkers(response.body()));
-                } else {
-                    view.showMaterialDialog(R.string.error_fetching_data);
-                }
-            }
-        });
+    private void processCrimeIncidentStatistics(ArrayList<CrimeIncidentStatistic> crimeIncidentStatistics) {
+        view.showDate(DateHelper.dateToStringForDisplay(oneMonthBeforeToday));
+        view.showMarkers(processCrimeCountMarkers(crimeIncidentStatistics));
     }
 
     private String buildWhereDistrictAndDateClause(String districtName) {
