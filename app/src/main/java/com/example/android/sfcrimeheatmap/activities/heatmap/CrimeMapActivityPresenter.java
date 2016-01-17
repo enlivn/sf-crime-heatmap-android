@@ -45,8 +45,6 @@ public class CrimeMapActivityPresenter {
     }
 
     public void loadPaginatedCrimeMarkersForDistrictsOnScreen(List<DistrictModel> districtModels, VisibleRegion visibleRegion) {
-        view.showProgressDialog();
-
         rx.Observable
                 .from(districtModels)
                 .subscribeOn(Schedulers.io())
@@ -54,6 +52,7 @@ public class CrimeMapActivityPresenter {
                 .filter(districtModel -> getDistrictModelsOnScreen(districtModel, visibleRegion))
                 .flatMap(this::fetchCrimeIncidentsForDistrict)
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnEach(crimeIncidentStatistics -> view.showProgressDialog())
                 .doOnTerminate(this::dismissProgressDialog)
                 .doOnError(this::showErrorDialog)
                 .onErrorResumeNext(throwable -> Observable.empty())
@@ -105,6 +104,7 @@ public class CrimeMapActivityPresenter {
         getCrimeCountsPerDistrict()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnEach(crimeIncidentStatistics -> view.showProgressDialog())
                 .doOnTerminate(this::dismissProgressDialog)
                 .doOnError(this::showErrorDialog)
                 .onErrorResumeNext(throwable -> Observable.empty())
