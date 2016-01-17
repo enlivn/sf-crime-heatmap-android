@@ -9,8 +9,10 @@ San Francisco Crime Heatmap Android
 ![Screenshot](screenshots/screenshot.png)
 </p>
 
-### How do I get set up? ###
+### Prerequisites
+* JDK 8.
 
+### How do I get set up? ###
 * Standard Gradle build. Import into Android Studio and you're good to go!
 
 ### Libraries used:
